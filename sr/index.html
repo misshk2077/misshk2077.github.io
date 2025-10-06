@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>最爱宝宝 - 生日快乐</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="starry-sky-container">
+        <canvas id="starry-sky"></canvas>
+    </div>
+
+    <div class="content-container">
+        <!-- 倒计时区域 -->
+        <div id="countdown-container" class="main-content">
+            <h1 class="title">距离我最爱的人生日还有</h1>
+            <div class="countdown-timer">
+                <div class="time-unit">
+                    <span id="days" class="time-value">00</span>
+                    <span class="time-label">天</span>
+                </div>
+                <div class="time-unit">
+                    <span id="hours" class="time-value">00</span>
+                    <span class="time-label">时</span>
+                </div>
+                <div class="time-unit">
+                    <span id="minutes" class="time-value">00</span>
+                    <span class="time-label">分</span>
+                </div>
+                <div class="time-unit">
+                    <span id="seconds" class="time-value">00</span>
+                    <span class="time-label">秒</span>
+                </div>
+            </div>
+            <p class="love-message">在这段等待的时光里，我的爱只增不减 ❤️</p>
+            
+            <!-- 生日提示 -->
+            <div class="birthday-reminder">
+                <span class="reminder-icon">🎁</span>
+                <p class="reminder-text">请记得在生日当天打开，这里有一份特别的惊喜在等你！</p>
+            </div>
+        </div>
+
+        <!-- 生日祝福区域 -->
+        <div id="birthday-container" class="main-content hidden">
+            <div class="fireworks-container">
+                <canvas id="fireworks-canvas"></canvas>
+            </div>
+            
+            <!-- 第一部分：头部祝福语 -->
+            <section class="fullscreen-section hidden" id="greeting-section">
+                <h1 class="title birthday-title">生日快乐，我最爱的宝宝！</h1>
+                
+                <!-- 礼物盒环节 -->
+                <div id="gift-section" class="gift-section">
+                    <div class="gift-box">
+                        <div class="gift-lid"></div>
+                        <div class="gift-box-body"></div>
+                        <div class="gift-ribbon"></div>
+                        <div class="gift-tag">点击打开你的礼物</div>
+                    </div>
+                </div>
+                
+                <!-- 主要祝福信息 - 添加hidden类 -->
+                <div class="birthday-message hidden">
+                    <p class="large-text">亲爱的宝宝，祝你生日快乐！</p>
+                    <p class="message-content">
+                        在这特别的日子里，小宝宝祝愿宝宝能不断成长进步，要保持乐观！
+                        从相识到相知，这是我为你过的第2个生日。
+                        希望在未来的日子里，我能继续陪伴在你身边，见证你的每一刻。
+                    </p>
+                    <p class="message-signature">永远爱你的陈小宝❤️</p>
+                </div>
+                
+                <!-- 滚动指示器 - 默认CSS已隐藏，不需要hidden类 -->
+                <div class="scroll-indicator"></div>
+            </section>
+
+            <!-- 第二部分：爱心树 -->
+            <section class="fullscreen-section hidden" id="love-tree-section">
+                <!-- 互动爱心树 -->
+                <div class="love-tree-container">
+                    <h2 class="section-title">我们的爱心树</h2>
+                    <p class="tree-instruction">点击屏幕添加一颗爱心</p>
+                    <canvas id="love-tree" width="300" height="400"></canvas>
+                </div>
+                
+                <!-- 滚动指示器 - 默认CSS已隐藏，不需要hidden类 -->
+                <div class="scroll-indicator"></div>
+            </section>
+
+            <!-- 第三部分：生日祝福和许愿 -->
+            <section class="fullscreen-section hidden" id="wishes-section">
+                <!-- 互动祝福卡片区 -->
+                <div class="wishes-container">
+                    <h2 class="section-title">生日祝福</h2>
+                    <div class="wishes-cards">
+                        <div class="wish-card" onclick="this.classList.toggle('flipped')">
+                            <div class="wish-card-front">
+                                <span>点我❤</span>
+                            </div>
+                            <div class="wish-card-back">
+                                <p>祝愿宝宝身体健康，快乐成长！</p>
+                            </div>
+                        </div>
+                        <div class="wish-card" onclick="this.classList.toggle('flipped')">
+                            <div class="wish-card-front">
+                                <span>点我❤</span>
+                            </div>
+                            <div class="wish-card-back">
+                                <p>希望宝宝能够赚更多钱钱给小宝宝花~嘿嘿！</p>
+                            </div>
+                        </div>
+                        <div class="wish-card" onclick="this.classList.toggle('flipped')">
+                            <div class="wish-card-front">
+                                <span>点我❤</span>
+                            </div>
+                            <div class="wish-card-back">
+                                <p>祝愿宝宝能够学业有成！</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 心愿许愿区 -->
+                <div class="wish-maker">
+                    <h2 class="section-title">许下生日愿望</h2>
+                    <div class="cake-container">
+                        <div class="cake">
+                            <div class="candle">
+                                <div class="flame"></div>
+                            </div>
+                        </div>
+                        <div class="wish-result" id="wish-result">
+                            <!-- 许愿后的提示信息将在这里显示 -->
+                        </div>
+                    </div>
+                    <button id="make-wish-btn" class="wish-button">吹蜡烛许愿</button>
+                </div>
+                
+                <!-- 滚动指示器 - 默认CSS已隐藏，不需要hidden类 -->
+                <div class="scroll-indicator"></div>
+            </section>
+
+            <!-- 第四部分：爱的告白 -->
+            <section class="fullscreen-section hidden" id="love-letter-section">
+                <!-- 爱的告白 -->
+                <div class="love-letter">
+                    <h2 class="section-title">给宝宝的一封信</h2>
+                    <div class="letter-content">
+                        <p>亲爱的宝宝，</p>
+                        <p>时光如梭，转眼间我们已相伴走过了许多日子。在你的生日这天，想告诉你，你是我生命中最美好的礼物。</p>
+                        <p>在我们认识的时间里，我见证了你从刚开始的羞涩到不正经，嘿嘿嘿。</p>
+                        <p>但感谢你出现在我的生命中，感谢你让我有机会爱你、陪伴你、与你一同成长。</p>
+                        <p>今后的路还很长，祝愿我们幸福美满。</p>
+                        <p>生日快乐，我最爱的宝宝！</p>
+                        <p class="signature">爱你的小宝宝</p>
+                    </div>
+                </div>
+                
+                <!-- 滚动指示器 - 默认CSS已隐藏，不需要hidden类 -->
+                <div class="scroll-indicator"></div>
+            </section>
+            
+            <div class="floating-hearts"></div>
+        </div>
+    </div>
+
+    <!-- 音乐播放器 -->
+    <div class="music-player">
+        <button id="music-toggle" class="music-btn">
+            <span class="music-icon">♪</span>
+        </button>
+        <audio id="bgm" loop>
+            <!-- 
+            请将你喜欢的音乐文件放在 assets/audio/ 目录下，并命名为 birthday-music.mp3
+            如果有多种格式，可以添加多个source标签以提高兼容性
+            -->
+            <source src="assets/audio/birthday-music.mp3" type="audio/mpeg">
+            <source src="assets/audio/birthday-music.ogg" type="audio/ogg">
+            <p>您的浏览器不支持HTML5音频</p>
+        </audio>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html> 
