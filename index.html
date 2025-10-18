@@ -864,8 +864,8 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
     <style>
 /* ----------------------------------
-   CSS 样式：紧凑型可折叠天数计时器
-   ---------------------------------- */
+    CSS 样式：紧凑型可折叠天数计时器 (主体无圆角，按钮保留圆角)
+    ---------------------------------- */
 
 body {
     margin: 0;
@@ -895,7 +895,9 @@ body {
     border-right: 1px solid rgba(255, 255, 255, 0.3);
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     
-    border-radius: 0 10px 10px 0; /* 展开时，左上左下无圆角 */
+    /* ***** 核心修改：主体圆角设为 0 ***** */
+    border-radius: 0; 
+    
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     
     color: #4a4a4a;
@@ -911,10 +913,7 @@ body {
 /* 核心修改 2: 折叠状态，完全隐藏主体 */
 .anniversary-tracker.collapsed {
     /* 100px 是主体宽度，15px 是左右 padding，1px 是右边框，25px 是按钮宽度 */
-    /* 计算：-(主体内容宽度 + 左侧 padding + 1px 边框) + 按钮宽度 */
-    left: calc(-100px - 15px - 15px - 1px + 25px); 
     /* 简化计算：左侧移动 (计时器总宽度 - 按钮宽度) */
-    /* 计时器总宽约 130px (100+15+15) */
     left: -105px; /* -130px + 25px = -105px。根据实际内边距和宽度计算*/
     
     /* 确保折叠时边框和圆角不变 */
@@ -955,8 +954,8 @@ body {
 
 
 /* ----------------------------------
-   折叠按钮样式 (宽度 25px)
-   ---------------------------------- */
+    折叠按钮样式 (宽度 25px)
+    ---------------------------------- */
 
 .collapse-button {
     position: absolute;
@@ -971,7 +970,10 @@ body {
     justify-content: center;
     
     background-color: rgba(255, 192, 203, 0.9); 
+    
+    /* ***** 核心修改：保留按钮圆角 ***** */
     border-radius: 0 10px 10px 0;
+    
     cursor: pointer;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     
@@ -1015,6 +1017,7 @@ body {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // 【！重要！】请在这里设置你们开始的日期和时间
+    // 假设今天是 2025 年 10 月 18 日。这里设置一个开始日期来计算天数。
     const START_DATE = new Date('2024-12-06T14:00:00'); 
     
     const trackerContainer = document.getElementById('anniversaryTracker');
@@ -1031,9 +1034,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // 计算精确的总天数（向下取整）
         const totalDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
         
-        daysCountSpan.textContent = totalDays.toLocaleString('en-US');
+        // 使用当前语言环境格式化数字，例如在中文环境中可能是 '1,234'
+        daysCountSpan.textContent = totalDays.toLocaleString();
 
-        // 每小时更新一次，以保证零点切换的准确性
+        // 设置一个延迟更新，例如每 1 小时更新一次，以保证零点切换的准确性
         setTimeout(updateTime, 3600000); 
     }
 
