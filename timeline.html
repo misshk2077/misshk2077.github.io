@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时光轴 ⏳ - 我们的点滴回忆</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+        /* 0. CSS 重置与基础设定 (与 page1 保持一致) */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #FFF5FA; /* 淡雅的背景色 */
+            overflow-x: hidden;
+        }
+
+        /* 1. 响应式排版与容器 (与 page1 保持一致) */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        h1, h2, h3 {
+            color: #E91E63; /* 主题粉色 */
+            margin-bottom: 0.8em;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 1em;
+            color: #555;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        /* 2. 导航栏 Navbar (与 page1 保持一致, 注意 active 类的变化) */
+        .navbar {
+            background: linear-gradient(135deg, #FF8FAB 0%, #FB607F 100%);
+            padding: 1em 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin-left: 25px;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 0.5em 0.8em;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background-color: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        
+        .menu-toggle {
+            display: none;
+            font-size: 1.5em;
+            color: #fff;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* 3. 页面主标题区域 */
+        .page-header {
+            background-color: #FFCDEA; /* 柔和粉色背景 */
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .page-header h1 {
+            font-size: 3em;
+            color: #D81B60; /* 深一点的粉色 */
+            margin-bottom: 0.2em;
+        }
+        .page-header .subtitle {
+            font-size: 1.3em;
+            color: #777;
+        }
+
+        /* 4. 时光轴 Timeline Specific Styles ⏳🗺️ */
+        .timeline-section {
+            padding: 0 0 60px 0; /* 顶部padding由page-header提供 */
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 900px; /* 限制时间轴最大宽度 */
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        /* 中心线 */
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 4px; /* 线条粗细 */
+            background-color: #FFB6C1; /* LightPink */
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px; /* (width/2) */
+            z-index: 1;
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+            opacity: 0; /* For GSAP animation */
+            transform: translateY(50px); /* For GSAP animation */
+        }
+        
+        /* 时间轴上的圆点 */
+        .timeline-item::after {
+            content: '💕'; /* 用爱心emoji做圆点 */
+            font-size: 1.5em; /* emoji 大小 */
+            position: absolute;
+            width: 30px; /* 调整容器大小以适应emoji */
+            height: 30px;
+            right: -17px; /* 调整位置使其在中心线上 (item padding + width/2 - dot_width/2)*/
+            background-color: #FFF5FA; /* 背景色与页面一致，使其看起来透明 */
+            text-align: center;
+            line-height: 1.1; /* 微调emoji垂直居中 */
+            top: 25px; /* 根据内容调整 */
+            border-radius: 50%;
+            z-index: 2;
+            color: #E91E63;
+        }
+
+        /* 左侧条目 */
+        .timeline-item.left {
+            left: 0;
+        }
+        /* 右侧条目 */
+        .timeline-item.right {
+            left: 50%;
+        }
+
+        /* 左侧条目的箭头 (指向右边) */
+        .timeline-item.left::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 32px; /* 与圆点对齐 */
+            width: 0;
+            z-index: 2;
+            right: 30px; /* 箭头位置 */
+            border: medium solid white; /* 箭头颜色与内容背景一致 */
+            border-width: 10px 0 10px 10px;
+            border-color: transparent transparent transparent white;
+        }
+
+        /* 右侧条目的箭头 (指向左边) */
+        .timeline-item.right::before {
+            content: " ";
+            height: 0;
+            position: absolute;
+            top: 32px; /* 与圆点对齐 */
+            width: 0;
+            z-index: 2;
+            left: 30px; /* 箭头位置 */
+            border: medium solid white; /* 箭头颜色与内容背景一致 */
+            border-width: 10px 10px 10px 0;
+            border-color: transparent white transparent transparent;
+        }
+        
+        /* 修正右侧条目的圆点位置 */
+        .timeline-item.right::after {
+            left: -13px; /* (item padding + width/2 - dot_width/2) for right items */
+        }
+
+        .timeline-content {
+            padding: 25px 30px;
+            background-color: white;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .timeline-content:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 6px 15px rgba(233, 30, 99, 0.15);
+        }
+
+        .timeline-date {
+            display: block;
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #FF69B4; /* 亮粉色 */
+            margin-bottom: 8px;
+        }
+
+        .timeline-content h3 {
+            font-size: 1.6em;
+            color: #C71585; /* 中紫罗兰红 */
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .timeline-content p {
+            font-size: 1em;
+            color: #4A4A4A;
+            line-height: 1.7;
+        }
+        .timeline-content img {
+            margin-top: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* "添加回忆" 区域 */
+        .add-memory-cta {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            background-color: #FFF0F5; /* LavenderBlush */
+            border-radius: 8px;
+        }
+        .add-memory-cta h3 {
+            font-size: 1.8em;
+            color: #DB7093; /* PaleVioletRed */
+        }
+        .add-memory-cta p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        .cta-button { /* 与 page1 保持一致，但可能需要微调 */
+            display: inline-block;
+            background-color: #FF69B4;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .cta-button:hover {
+            background-color: #FF1493;
+            transform: translateY(-2px);
+        }
+
+
+        /* 5. 页脚 Footer (与 page1 保持一致) */
+        .site-footer {
+            background-color: #4A4A4A;
+            color: #E0E0E0;
+            text-align: center;
+            padding: 30px 0;
+            font-size: 0.95em;
+        }
+        .site-footer p {
+            margin-bottom: 0.5em;
+            color: #E0E0E0;
+        }
+        .site-footer a {
+            color: #FFB6C1;
+            text-decoration: none;
+        }
+        .site-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* 6. 响应式设计 Media Queries */
+        @media (max-width: 768px) {
+            /* 移动端导航栏 */
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                position: absolute;
+                top: 70px; /* 根据navbar高度调整 */
+                left: 0;
+                background: linear-gradient(135deg, #FB607F 0%, #FF8FAB 100%);
+                padding: 10px 0;
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .nav-links li {
+                margin: 10px 0;
+                text-align: center;
+            }
+            .menu-toggle {
+                display: block;
+            }
+
+            .page-header h1 {
+                font-size: 2.5em;
+            }
+            .page-header .subtitle {
+                font-size: 1.1em;
+            }
+
+            /* 时间轴响应式 */
+            .timeline::after { /* 中心线移到左边 */
+                left: 31px;
+            }
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px; /* 为左侧的线和点留出空间 */
+                padding-right: 15px;
+            }
+            .timeline-item.left, .timeline-item.right {
+                left: 0%; /* 所有条目都在左侧线的右边 */
+            }
+            .timeline-item.left::before, .timeline-item.right::before { /* 移动箭头 */
+                left: 60px; /* 指向左侧的线 */
+                border-width: 10px 10px 10px 0;
+                border-color: transparent white transparent transparent;
+            }
+            .timeline-item.left::after, .timeline-item.right::after { /* 移动圆点 */
+                left: 14px; /* (padding-left / 2) - (dot_width/2) roughly */
+            }
+             .timeline-content h3 {
+                font-size: 1.4em;
+            }
+            .timeline-content p {
+                font-size: 0.95em;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .page-header h1 {
+                font-size: 2em;
+            }
+            .timeline-content {
+                padding: 20px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">爱の印记 💖</a>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">甜蜜主页 🏠</a></li>
+                <li><a href="timeline.html" class="active">时光轴 ⏳</a></li>
+                <li><a href="album.html">甜蜜相册 📸</a></li>
+                <li><a href="fxq1/index.html">飞行棋 ✈️</a></li> 
+                <li><a href="sr/index.html">生日纪念 🎂</a></li> </ul>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>时光轴 ⏳</h1>
+            <p class="subtitle">每一段回忆，都是我们爱情故事中闪亮的星辰 ✨</p>
+        </div>
+    </section>
+
+    <section class="timeline-section">
+        <div class="container">
+            <div class="timeline">
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <span class="timeline-date">2022年05月20日 📅</span>
+                        <h3>初遇 · 心动瞬间 🥰</h3>
+                        <p>在一个充满阳光的午后，我们的目光偶然交汇，仿佛整个世界都安静了下来。缘分，妙不可言！</p>
+                        <img src="" alt="">
+                    </div>
+                </div>
+
+                <div class="timeline-item right">
+
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <span class="timeline-date">2024年11月13日 💘</span>
+                        <h3>情人劫 · 定情信物 🎁</h3>
+                        <p>我们交换了精心挑选的礼物，那不仅仅是物品，更是我们对彼此深深的承诺与爱意。</p>
+                        <img src="" alt="">
+                    </div>
+                </div>
+                    <div class="timeline-content">
+                        <span class="timeline-date">2024年1月15日 💌</span>
+                        <h3>第一次约会 · 浪漫晚餐 🥂</h3>
+                        <p>精心准备的晚餐，聊不完的话题，还有那晚皎洁的月光，一切都那么完美。我们的故事，正式开始谱写。</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <span class="timeline-date">2024年12月30日 ✈️</span>
+                        <h3>第一次旅行 · 大街散步 🌊☀️</h3>
+                        <p>手牵手漫步在街道，看日出日落，听汽车声声。那些无忧无虑的日子，是相机也记录不完的美好。</p>
+                        <img src="" alt="">
+                    </div>
+                </div>
+
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <span class="timeline-date">2025年01月01日 🎉</span>
+                        <h3>跨年夜 · 共同许愿 🌟</h3>
+                        <p>在绚烂的烟花下，我们一起倒数，迎接新的一年。悄悄许下的愿望里，都有对方的名字。</p>
+                    </div>
+                </div>
+                 <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <span class="timeline-date">2025年12月06日 💍</span>
+                        <h3>周年纪念 · 温馨庆祝 💖</h3>
+                        <p>不知不觉，我们已经携手走过了又一个年头。简单的庆祝，却充满了爱与感激。未来的路，我们继续并肩前行！</p>
+                        <img src="" alt="">
+                    </div>
+                </div>
+            </div>
+
+            <div class="add-memory-cta">
+                <h3>未完待续... 📝</h3>
+                <p>我们的故事还在继续，更多精彩瞬间，等待我们一起创造与记录！💖</p>
+                <a href="#" class="cta-button">分享你的回忆 🥰</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>用 ❤️ 构建 | [陈小宝] & [钟大宝] &copy; 2025</p>
+            <p>时光不老，我们不散 ✨</p>
+            <p><a href="#">回到顶部 ↑</a></p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Navbar animations (simple fade in for this page)
+            gsap.fromTo('.logo', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.2 });
+            gsap.fromTo('.nav-links li', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.15, delay: 0.4 });
+            
+            // Page Header Animation
+            gsap.from('.page-header h1', { opacity:0, y:-30, duration: 0.8, delay: 0.5, ease:'power3.out' });
+            gsap.from('.page-header .subtitle', { opacity:0, y:-20, duration: 0.8, delay: 0.7, ease:'power3.out' });
+
+            // Timeline items animation
+            const timelineItems = gsap.utils.toArray('.timeline-item');
+            timelineItems.forEach((item, index) => {
+                let direction = 1; // Default slide from right for 'right' items
+                if (item.classList.contains('left')) {
+                    direction = -1; // Slide from left for 'left' items
+                }
+
+                gsap.fromTo(item, 
+                    { opacity: 0, x: direction * 100, y:50 }, // Start from side and slightly down
+                    {
+                        opacity: 1,
+                        x: 0,
+                        y: 0,
+                        duration: 0.8,
+                        ease: 'power3.out',
+                        scrollTrigger: {
+                            trigger: item,
+                            start: 'top 85%', // When 85% of the item is visible
+                            toggleActions: 'play none none none', // Play once
+                            // markers: true, // Uncomment for debugging ScrollTrigger
+                        }
+                    }
+                );
+            });
+            
+            // CTA section animation
+            gsap.from('.add-memory-cta', {
+                opacity: 0,
+                y: 50,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: '.add-memory-cta',
+                    start: 'top 90%',
+                    toggleActions: 'play none none none'
+                }
+            });
+
+
+            // Responsive Navbar Toggle (same as page1)
+            const menuToggle = document.getElementById('menuToggle');
+            const navLinks = document.getElementById('navLinks');
+
+            if (menuToggle && navLinks) {
+                menuToggle.addEventListener('click', () => {
+                    navLinks.classList.toggle('active');
+                    if (navLinks.classList.contains('active')) {
+                        menuToggle.innerHTML = '✕'; 
+                    } else {
+                        menuToggle.innerHTML = '☰';
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
