@@ -680,6 +680,387 @@
  
         });
     </script>
+    <style>
+/* ----------------------------------
+   CSS 样式 (浅灰毛玻璃效果 + 暂停时停止 + 加长斜杠)
+   ---------------------------------- */
+
+/* 旋转动画定义 */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 按钮的定位和基本样式 */
+.music-button {
+    /* 固定定位在视口 (viewport) */
+    position: fixed;
+    bottom: 30px; 
+    right: 30px;  
+    
+    /* 按钮外观 */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; 
+    
+    /* 浅灰色毛玻璃背景 */
+    background-color: rgba(0, 0, 0, 0.15); 
+    backdrop-filter: blur(8px); 
+    -webkit-backdrop-filter: blur(8px); 
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
+    
+    /* 图标样式 */
+    color: white; 
+    font-size: 32px; 
+    line-height: 1; 
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    z-index: 1000; 
+
+    /* 居中图标 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    
+    /* 确保伪元素定位参考这个父元素 */
+    position: fixed; 
+}
+
+/* 按钮悬停效果 */
+.music-button:hover {
+    background-color: rgba(0, 0, 0, 0.3); 
+    transform: scale(1.05); 
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); 
+}
+
+/* 音乐图标的默认动画设置 */
+#musicIcon {
+    animation: spin 2s linear infinite; 
+    animation-play-state: paused; 
+    transform: translateY(2px); 
+    transition: opacity 0.3s; 
+}
+
+
+/* 音乐正在播放时，音符图标开始旋转 */
+.music-button.playing #musicIcon {
+    animation-play-state: running; 
+}
+
+/* ----------------------------------
+   暂停时的斜杠效果 (核心修改部分)
+   ---------------------------------- */
+
+/* 定义斜杠伪元素 */
+.music-button::after {
+    content: ''; 
+    position: absolute;
+    /* 斜杠的尺寸和样式 */
+    width: 45px; /* *** 核心修改：斜杠长度增加到 45px *** */
+    height: 3px; 
+    
+    /* 斜杠颜色：柔和的半透明白色 */
+    background-color: rgba(255, 255, 255, 0.7); 
+    
+    border-radius: 2px;
+    
+    /* 定位和旋转斜杠 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg); 
+    
+    /* 默认隐藏斜杠 (在播放时隐藏) */
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none; 
+    z-index: 1001; 
+}
+
+/* 当按钮不处于播放状态时 (默认状态或暂停时)，显示斜杠 */
+.music-button:not(.playing)::after {
+    opacity: 1;
+}
+/* ---------------------------------- */
+
+
+/* 仅为演示毛玻璃效果，给 body 添加背景图 */
+body {
+    background: url('https://picsum.photos/1920/1080?random=1') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 200vh; 
+}
+    </style>
+</head>
+<body>
+
+    <button id="musicButton" class="music-button">
+        <span id="musicIcon">♪</span>
+    </button>
+
+    <audio id="backgroundMusic" loop>
+        <source src="./assets/audio/birthday-music.mp3" type="audio/mpeg">
+        您的浏览器不支持 audio 元素。
+    </audio>
+
+    <script>
+/* ----------------------------------
+   JavaScript 交互逻辑 (保持不变)
+   ---------------------------------- */
+document.addEventListener('DOMContentLoaded', () => {
+    const musicButton = document.getElementById('musicButton');
+    const backgroundMusic = document.getElementById('backgroundMusic');
+
+    let hasInteracted = false; 
+    let isPlaying = false;
+
+    const playMusic = () => {
+        backgroundMusic.play().then(() => {
+            isPlaying = true;
+            musicButton.classList.add('playing'); 
+            console.log('音乐播放');
+        }).catch(error => {
+            console.error('播放失败:', error);
+        });
+    };
+
+    const pauseMusic = () => {
+        backgroundMusic.pause();
+        isPlaying = false;
+        musicButton.classList.remove('playing'); 
+        console.log('音乐暂停');
+    };
+
+    const handleFirstInteraction = () => {
+        if (!hasInteracted) {
+            hasInteracted = true;
+            playMusic();
+            
+            document.removeEventListener('click', handleFirstInteraction);
+            document.removeEventListener('keydown', handleFirstInteraction);
+            document.removeEventListener('touchstart', handleFirstInteraction);
+        }
+    };
+
+    document.addEventListener('click', handleFirstInteraction);
+    document.addEventListener('keydown', handleFirstInteraction);
+    document.addEventListener('touchstart', handleFirstInteraction);
+
+    musicButton.addEventListener('click', (event) => {
+        event.stopPropagation(); 
+        
+        if (hasInteracted) {
+            if (isPlaying) {
+                pauseMusic();
+            } else {
+                playMusic();
+            }
+        }
+    });
+
+    backgroundMusic.load();
+});
+    </script>
+    <style>
+/* ----------------------------------
+   CSS 样式：紧凑型可折叠天数计时器
+   ---------------------------------- */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('https://picsum.photos/1920/1080?random=2') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+}
+
+/* 计时器容器 (主体宽度 100px) */
+.anniversary-tracker {
+    position: fixed;
+    top: 50%; 
+    
+    /* 核心修改 1: 展开时贴合左边 */
+    left: 0; 
+    
+    transform: translateY(-50%); 
+    
+    /* 外观 */
+    background-color: rgba(255, 192, 203, 0.25); 
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* 移除左侧边框，使其在展开时贴合边缘 */
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    
+    border-radius: 0 10px 10px 0; /* 展开时，左上左下无圆角 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    
+    color: #4a4a4a;
+    text-align: center;
+    padding: 10px 15px; 
+    width: 100px; 
+    z-index: 2000; 
+    
+    /* 关键：启用过渡动画 */
+    transition: left 0.4s ease-in-out;
+}
+
+/* 核心修改 2: 折叠状态，完全隐藏主体 */
+.anniversary-tracker.collapsed {
+    /* 100px 是主体宽度，15px 是左右 padding，1px 是右边框，25px 是按钮宽度 */
+    /* 计算：-(主体内容宽度 + 左侧 padding + 1px 边框) + 按钮宽度 */
+    left: calc(-100px - 15px - 15px - 1px + 25px); 
+    /* 简化计算：左侧移动 (计时器总宽度 - 按钮宽度) */
+    /* 计时器总宽约 130px (100+15+15) */
+    left: -105px; /* -130px + 25px = -105px。根据实际内边距和宽度计算*/
+    
+    /* 确保折叠时边框和圆角不变 */
+}
+
+
+/* 计时器内部内容 */
+.tracker-content {
+    transition: opacity 0.4s;
+}
+
+.anniversary-tracker.collapsed .tracker-content {
+    opacity: 0; /* 折叠时隐藏内容 */
+    pointer-events: none;
+}
+
+/* 标题和起始日期 (缩小字体) */
+.anniversary-tracker h1 {
+    font-size: 0.85em; 
+    margin: 0 0 8px 0;
+    font-weight: 500;
+}
+
+/* 主天数显示 (缩小字体) */
+.day-count {
+    font-size: 2.2em; 
+    font-weight: bold;
+    color: #d81b60; 
+    line-height: 1.1;
+}
+
+.day-label {
+    font-size: 0.7em; 
+    font-weight: 500;
+    color: #6a6a6a;
+    margin-top: 3px;
+}
+
+
+/* ----------------------------------
+   折叠按钮样式 (宽度 25px)
+   ---------------------------------- */
+
+.collapse-button {
+    position: absolute;
+    top: -1px; /* 向上微调 1px 覆盖边框 */
+    right: -25px; /* 按钮宽度为 25px */
+    width: 25px; 
+    /* 确保按钮高度和父容器高度匹配，从 -1px 到 100%+1px */
+    height: calc(100% + 2px); 
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    background-color: rgba(255, 192, 203, 0.9); 
+    border-radius: 0 10px 10px 0;
+    cursor: pointer;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    
+    font-size: 1em; 
+    color: #4a4a4a;
+    transition: background-color 0.2s;
+}
+
+.collapse-button:hover {
+    background-color: rgba(255, 192, 203, 1);
+}
+
+/* 按钮内部的箭头图标 */
+.arrow {
+    transition: transform 0.4s;
+    font-weight: 800;
+}
+
+/* 折叠时，箭头图标旋转指向右侧 */
+.anniversary-tracker.collapsed .arrow {
+    transform: rotate(180deg);
+}
+    </style>
+</head>
+<body>
+
+<div id="anniversaryTracker" class="anniversary-tracker">
+    <div id="collapseButton" class="collapse-button">
+        <span class="arrow">❮</span>
+    </div>
+
+    <div class="tracker-content">
+        <h1>我们在一起</h1>
+        
+        <div class="day-count" id="daysCount">0</div>
+        <div class="day-label">天</div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 【！重要！】请在这里设置你们开始的日期和时间
+    const START_DATE = new Date('2024-12-06T14:00:00'); 
+    
+    const trackerContainer = document.getElementById('anniversaryTracker');
+    const daysCountSpan = document.getElementById('daysCount');
+    const collapseButton = document.getElementById('collapseButton');
+    
+    let isCollapsed = false;
+
+    // --- 1. 计时逻辑 ---
+    function updateTime() {
+        const now = new Date();
+        const diffInMs = now.getTime() - START_DATE.getTime();
+        
+        // 计算精确的总天数（向下取整）
+        const totalDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+        
+        daysCountSpan.textContent = totalDays.toLocaleString('en-US');
+
+        // 每小时更新一次，以保证零点切换的准确性
+        setTimeout(updateTime, 3600000); 
+    }
+
+    // --- 2. 折叠逻辑 ---
+    function toggleCollapse() {
+        if (isCollapsed) {
+            // 展开
+            trackerContainer.classList.remove('collapsed');
+            isCollapsed = false;
+        } else {
+            // 折叠
+            trackerContainer.classList.add('collapsed');
+            isCollapsed = true;
+        }
+    }
+
+    // 绑定折叠按钮事件
+    collapseButton.addEventListener('click', toggleCollapse);
+    
+    // 默认执行一次计时
+    updateTime(); 
+    
+    // 默认执行一次折叠，让它一开始就处于隐藏状态，避免影响内容浏览
+    // 如果不需要一开始就折叠，请删除下面这行
+    // toggleCollapse(); 
+});
+</script>
  
 </body>
 </html>
