@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>甜蜜主页 💕 - 陈❤钟</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
     <style>
         /* 0. CSS 重置与基础设定 */
         *,
@@ -48,16 +49,34 @@
             border-radius: 8px;
         }
  
-        /* 2. 导航栏  Navbar 🎨 */
+        /* 2. 导航栏 Navbar 🎨 */
         .navbar {
-            background: linear-gradient(135deg, #FF8FAB 0%, #FB607F 100%); /* 渐变粉色 */
+            /* ****** 核心样式：粉色毛玻璃效果 (桌面端) ****** */
+            background: rgba(255, 179, 203, 0.4); /* 透明粉色背景 (0.4 透明度) */
+            backdrop-filter: blur(15px); /* 模糊背景 (增强至 15px) */
+            -webkit-backdrop-filter: blur(15px); /* Safari 支持 (增强至 15px) */
+            /* ********************************* */
+
             padding: 1em 0;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
+            
+            /* ******** 滚动折叠/展开所需修改 ******** */
+            position: fixed; /* 从 sticky 变为 fixed */
+            width: 100%; /* 确保占据整个宽度 */
             top: 0;
+            transform: translateY(0); /* 默认位置 */
+            transition: transform 0.4s ease-in-out, background-color 0.3s ease; /* 新增 transform 过渡 */
+            /* ************************************** */
+            
             z-index: 1000;
-            transition: background-color 0.3s ease;
+            /* **已移除原有的圆角样式，导航栏底部保持直角** */
         }
+ 
+        /* ****** 新增：隐藏导航栏的类 ****** */
+        .navbar.navbar-hidden {
+            transform: translateY(-100%); /* 向上移动 100%，确保完全隐藏 */
+        }
+        /* ********************************* */
  
         .navbar .container {
             display: flex;
@@ -73,6 +92,8 @@
             color: #fff;
             text-decoration: none;
             animation: fadeInDown 1s ease-out;
+            /* 提高 logo 对比度，使其在透明背景上更清晰 */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
         }
  
         .nav-links {
@@ -104,6 +125,8 @@
             padding: 0.5em 0.8em;
             border-radius: 5px;
             transition: background-color 0.3s ease, transform 0.2s ease;
+            /* 提高链接对比度 */
+            text-shadow: 0 0 2px rgba(0,0,0,0.2); 
         }
  
         .nav-links a:hover, .nav-links a.active {
@@ -129,7 +152,11 @@
             background-color: #FFCDEA; /* 柔和粉色 */
             color: #fff;
             text-align: center;
-            padding: 80px 20px;
+            
+            /* ****** 核心修改：调整顶部内边距，确保内容不被 fixed 导航栏遮挡 ****** */
+            /* 导航栏高度约为 78px，原内容顶部内边距为 80px。总共 158px */
+            padding: 158px 20px 80px 20px; /* 顶部内边距 158px */
+            
             position: relative;
             overflow: hidden; /* For pseudo-element overlay */
         }
@@ -374,25 +401,50 @@
         }
  
         @media (max-width: 768px) {
+            /* ****** 核心修改点：实现平滑折叠/展开（使用 max-height 替代 display: none） ****** */
+            .nav-links {
+                /* 与 .navbar 保持完全一致的毛玻璃效果 */
+                background: rgba(255, 179, 203, 0.4); /* 透明度 0.4 */
+                backdrop-filter: blur(15px); /* **增强模糊至 15px** */
+                -webkit-backdrop-filter: blur(15px); /* **增强模糊至 15px** */
+                
+                /* 确保菜单在导航栏下方显示，并且是全宽 */
+                display: flex; /* 保持 flex 布局以垂直排列 */
+                flex-direction: column;
+                width: 100%;
+                position: absolute;
+                top: 78px; /* 避免重叠 */
+                left: 0;
+                
+                /* ****** 核心：平滑折叠/展开所需 CSS ****** */
+                max-height: 0; /* 默认折叠，高度为零 */
+                overflow: hidden; /* 隐藏超出高度的内容 */
+                transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out, box-shadow 0.5s ease-in-out; /* 缓慢过渡 */
+                padding: 0; /* 初始无内边距 */
+                box-shadow: none; /* 初始无阴影 */
+                /* ************************************** */
+                
+                /* ******** 保留展开菜单的圆角样式 ******** */
+                border-bottom-left-radius: 15px; /* 左下角圆角 */
+                border-bottom-right-radius: 15px; /* 右下角圆角 */
+                /* ***************************** */
+            }
+            /* ****************************************************** */
+            
             .hero h1 {
                 font-size: 2.8em;
             }
             .hero .subtitle {
                 font-size: 1.2em;
             }
-            .nav-links {
-                display: none; /* 隐藏链接 */
-                flex-direction: column;
-                width: 100%;
-                position: absolute;
-                top: 70px; /* 根据navbar高度调整 */
-                left: 0;
-                background: linear-gradient(135deg, #FB607F 0%, #FF8FAB 100%);
-                padding: 10px 0;
-            }
+            
+            /* 激活状态：展开菜单 */
             .nav-links.active {
-                display: flex; /* 点击后显示 */
+                max-height: 300px; /* 足够容纳所有链接的高度 */
+                padding: 10px 0; /* 展开时显示内边距 */
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 展开时显示阴影 */
             }
+            
             .nav-links li {
                 margin: 10px 0;
                 text-align: center;
@@ -456,8 +508,235 @@
             opacity: 0;
             transform: translateY(-30px) rotateX(90deg) scale(0.5);
         }
- 
- 
+        
+        /* ----------------------------------
+           CSS 样式 (浅灰毛玻璃效果 + 暂停时停止 + 加长斜杠)
+           ---------------------------------- */
+
+        /* 旋转动画定义 */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 按钮的定位和基本样式 */
+        .music-button {
+            /* 固定定位在视口 (viewport) */
+            position: fixed;
+            bottom: 30px; 
+            right: 30px;  
+            
+            /* 按钮外观 */
+            width: 60px;
+            height: 60px;
+            border-radius: 50%; 
+            
+            /* 浅灰色毛玻璃背景 */
+            background-color: rgba(0, 0, 0, 0.15); 
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
+            
+            /* 图标样式 */
+            color: white; 
+            font-size: 32px; 
+            line-height: 1; 
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            z-index: 1000; 
+
+            /* 居中图标 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            
+            /* 确保伪元素定位参考这个父元素 */
+            position: fixed; 
+        }
+
+        /* 按钮悬停效果 */
+        .music-button:hover {
+            background-color: rgba(0, 0, 0, 0.3); 
+            transform: scale(1.05); 
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); 
+        }
+
+        /* 音乐图标的默认动画设置 */
+        #musicIcon {
+            animation: spin 2s linear infinite; 
+            animation-play-state: paused; 
+            transform: translateY(2px); 
+            transition: opacity 0.3s; 
+        }
+
+
+        /* 音乐正在播放时，音符图标开始旋转 */
+        .music-button.playing #musicIcon {
+            animation-play-state: running; 
+        }
+
+        /* ----------------------------------
+           暂停时的斜杠效果 (核心修改部分)
+           ---------------------------------- */
+
+        /* 定义斜杠伪元素 */
+        .music-button::after {
+            content: ''; 
+            position: absolute;
+            /* 斜杠的尺寸和样式 */
+            width: 45px; /* *** 核心修改：斜杠长度增加到 45px *** */
+            height: 3px; 
+            
+            /* 斜杠颜色：柔和的半透明白色 */
+            background-color: rgba(255, 255, 255, 0.7); 
+            
+            border-radius: 2px;
+            
+            /* 定位和旋转斜杠 */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg); 
+            
+            /* 默认隐藏斜杠 (在播放时隐藏) */
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none; 
+            z-index: 1001; 
+        }
+
+        /* 当按钮不处于播放状态时 (默认状态或暂停时)，显示斜杠 */
+        .music-button:not(.playing)::after {
+            opacity: 1;
+        }
+        /* ---------------------------------- */
+        
+        /* ----------------------------------
+            CSS 样式：毛玻璃弹窗公告
+            ---------------------------------- */
+
+        /* 定义颜色变量 */
+        :root {
+            --light-pink: #ffb6c1; /* 淡粉色 */
+            --dark-pink: #d81b60;  /* 深粉色/洋红色 */
+        }
+
+        /* 遮罩层 (Modal Backdrop) */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 略微变暗背景 */
+            z-index: 9999; /* 确保在最上层 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        /* 隐藏状态 */
+        .modal-backdrop.hidden {
+            opacity: 0;
+            pointer-events: none;  
+        }
+
+
+        /* 公告弹窗主体 (Frosted Glass Modal) */
+        .announcement-modal {
+            width: 90%;
+            max-width: 300px; /* 缩小最大宽度 */
+            padding: 20px; /* 缩小内边距 */
+            
+            /* 核心：毛玻璃效果 */
+            background-color: rgba(255, 255, 255, 0.3); /* 透明白色背景 */
+            backdrop-filter: blur(15px); /* 模糊背景强度 */
+            -webkit-backdrop-filter: blur(15px);
+            
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.5);  
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            
+            /* ****** 更改字体为炫酷字体 ****** */
+            font-family: 'Zhi Mang Xing', cursive, sans-serif; 
+            /* ***************************** */
+            
+            color: #333;
+            text-align: center;
+            transform: scale(1);
+            transition: transform 0.3s ease;
+        }
+
+        /* 动画效果：隐藏时稍微缩小 */
+        .modal-backdrop.hidden .announcement-modal {
+            transform: scale(0.95);
+        }
+
+
+        /* 弹窗内容样式 */
+        .modal-title {
+            font-size: 1.5em; /* 缩小字体 */
+            font-weight: bold;
+            color: var(--light-pink); /* 标题为淡粉色 */
+            margin-bottom: 10px;  
+        }
+
+        .modal-content-text {
+            font-size: 1em; /* 缩小字体 */
+            line-height: 1.5;
+            margin-bottom: 15px;  
+            color: var(--light-pink); /* 正文和内容容器为淡粉色 */
+        }
+
+
+        /* 计时器周围文字样式 */
+        .days-counter-section {
+            font-size: 1em;
+            margin: 15px 0;  
+            color: var(--light-pink); /* 计时器周围文字为淡粉色 */
+            line-height: 1.3;
+            padding: 8px 0;  
+            border-top: 1px solid rgba(255, 255, 255, 0.5);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* 天数数字样式 */
+        .day-count-modal {
+            font-size: 2.2em; /* 缩小字体 */
+            font-weight: 900;
+            /* ****** 核心修改点：天数数字使用淡粉色 (light-pink) ****** */
+            color: var(--light-pink); 
+            /* ************************************************* */
+            line-height: 1.1;
+            display: block;  
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+
+        /* 关闭按钮 */
+        .close-button {
+            padding: 8px 15px;  
+            border: none;
+            border-radius: 6px;  
+            background-color: #ff6f9f;
+            color: white;
+            font-size: 0.9em;  
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            /* 关闭按钮继承 body 的字体栈，保持易读性 */
+            font-family: inherit; 
+        }
+
+        .close-button:hover {
+            background-color: var(--dark-pink); /* 使用深粉色作为 Hover 效果 */
+        }
+
+        .close-button:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
@@ -632,7 +911,43 @@
             // Responsive Navbar Toggle
             const menuToggle = document.getElementById('menuToggle');
             const navLinks = document.getElementById('navLinks');
- 
+            const navbar = document.querySelector('.navbar'); // **获取导航栏元素**
+
+            // **核心修改：滚动折叠/展开逻辑**
+            let lastScrollTop = 0;
+            const scrollThreshold = 50; // 滚过 50px 后才开始隐藏/显示逻辑
+
+            window.addEventListener('scroll', function() {
+                const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+
+                // 只有当滚动条离开顶部足够远时，才允许隐藏/显示整体导航栏
+                if (currentScrollTop > scrollThreshold) {
+                    if (currentScrollTop > lastScrollTop) {
+                        // 向下滚动 - 隐藏导航栏 (整体)
+                        navbar.classList.add('navbar-hidden');
+                        
+                        // *** 核心逻辑：如果菜单打开，则关闭它（实现缓慢折叠） ***
+                        if (navLinks.classList.contains('active')) {
+                            navLinks.classList.remove('active');
+                            menuToggle.innerHTML = '☰';
+                        }
+                        // *** 结束核心逻辑 ***
+
+                    } else {
+                        // 向上滚动 - 显示导航栏 (整体)
+                        navbar.classList.remove('navbar-hidden');
+                    }
+                } else {
+                    // 靠近顶部 - 始终显示导航栏
+                    navbar.classList.remove('navbar-hidden');
+                }
+
+                // 更新上一次滚动位置
+                lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop; 
+            });
+            // **结束：滚动折叠/展开逻辑**
+
+
             if (menuToggle && navLinks) {
                 menuToggle.addEventListener('click', () => {
                     navLinks.classList.toggle('active');
@@ -680,120 +995,7 @@
  
         });
     </script>
-    <style>
-/* ----------------------------------
-   CSS 样式 (浅灰毛玻璃效果 + 暂停时停止 + 加长斜杠)
-   ---------------------------------- */
-
-/* 旋转动画定义 */
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* 按钮的定位和基本样式 */
-.music-button {
-    /* 固定定位在视口 (viewport) */
-    position: fixed;
-    bottom: 30px; 
-    right: 30px;  
     
-    /* 按钮外观 */
-    width: 60px;
-    height: 60px;
-    border-radius: 50%; 
-    
-    /* 浅灰色毛玻璃背景 */
-    background-color: rgba(0, 0, 0, 0.15); 
-    backdrop-filter: blur(8px); 
-    -webkit-backdrop-filter: blur(8px); 
-    border: 1px solid rgba(255, 255, 255, 0.1); 
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); 
-    
-    /* 图标样式 */
-    color: white; 
-    font-size: 32px; 
-    line-height: 1; 
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
-    z-index: 1000; 
-
-    /* 居中图标 */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    
-    /* 确保伪元素定位参考这个父元素 */
-    position: fixed; 
-}
-
-/* 按钮悬停效果 */
-.music-button:hover {
-    background-color: rgba(0, 0, 0, 0.3); 
-    transform: scale(1.05); 
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); 
-}
-
-/* 音乐图标的默认动画设置 */
-#musicIcon {
-    animation: spin 2s linear infinite; 
-    animation-play-state: paused; 
-    transform: translateY(2px); 
-    transition: opacity 0.3s; 
-}
-
-
-/* 音乐正在播放时，音符图标开始旋转 */
-.music-button.playing #musicIcon {
-    animation-play-state: running; 
-}
-
-/* ----------------------------------
-   暂停时的斜杠效果 (核心修改部分)
-   ---------------------------------- */
-
-/* 定义斜杠伪元素 */
-.music-button::after {
-    content: ''; 
-    position: absolute;
-    /* 斜杠的尺寸和样式 */
-    width: 45px; /* *** 核心修改：斜杠长度增加到 45px *** */
-    height: 3px; 
-    
-    /* 斜杠颜色：柔和的半透明白色 */
-    background-color: rgba(255, 255, 255, 0.7); 
-    
-    border-radius: 2px;
-    
-    /* 定位和旋转斜杠 */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-45deg); 
-    
-    /* 默认隐藏斜杠 (在播放时隐藏) */
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none; 
-    z-index: 1001; 
-}
-
-/* 当按钮不处于播放状态时 (默认状态或暂停时)，显示斜杠 */
-.music-button:not(.playing)::after {
-    opacity: 1;
-}
-/* ---------------------------------- */
-
-
-/* 仅为演示毛玻璃效果，给 body 添加背景图 */
-body {
-    background: url('https://picsum.photos/1920/1080?random=1') no-repeat center center fixed;
-    background-size: cover;
-    min-height: 200vh; 
-}
-    </style>
-</head>
-<body>
 
     <button id="musicButton" class="music-button">
         <span id="musicIcon">♪</span>
@@ -806,7 +1008,7 @@ body {
 
     <script>
 /* ----------------------------------
-   JavaScript 交互逻辑 (保持不变)
+   JavaScript 交互逻辑 (音乐播放器)
    ---------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
     const musicButton = document.getElementById('musicButton');
@@ -832,6 +1034,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('音乐暂停');
     };
 
+    // 监听首次交互，用于解决浏览器自动播放限制
     const handleFirstInteraction = () => {
         if (!hasInteracted) {
             hasInteracted = true;
@@ -862,170 +1065,41 @@ document.addEventListener('DOMContentLoaded', () => {
     backgroundMusic.load();
 });
     </script>
-    <style>
-/* ----------------------------------
-    CSS 样式：紧凑型可折叠天数计时器 (主体无圆角，按钮保留圆角)
-    ---------------------------------- */
 
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: url('https://picsum.photos/1920/1080?random=2') no-repeat center center fixed;
-    background-size: cover;
-    min-height: 100vh;
-}
-
-/* 计时器容器 (主体宽度 100px) */
-.anniversary-tracker {
-    position: fixed;
-    top: 50%; 
-    
-    /* 核心修改 1: 展开时贴合左边 */
-    left: 0; 
-    
-    transform: translateY(-50%); 
-    
-    /* 外观 */
-    background-color: rgba(255, 192, 203, 0.25); 
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    /* 移除左侧边框，使其在展开时贴合边缘 */
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    border-right: 1px solid rgba(255, 255, 255, 0.3);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    
-    /* ***** 核心修改：主体圆角设为 0 ***** */
-    border-radius: 0; 
-    
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    
-    color: #4a4a4a;
-    text-align: center;
-    padding: 10px 15px; 
-    width: 100px; 
-    z-index: 2000; 
-    
-    /* 关键：启用过渡动画 */
-    transition: left 0.4s ease-in-out;
-}
-
-/* 核心修改 2: 折叠状态，完全隐藏主体 */
-.anniversary-tracker.collapsed {
-    /* 100px 是主体宽度，15px 是左右 padding，1px 是右边框，25px 是按钮宽度 */
-    /* 简化计算：左侧移动 (计时器总宽度 - 按钮宽度) */
-    left: -105px; /* -130px + 25px = -105px。根据实际内边距和宽度计算*/
-    
-    /* 确保折叠时边框和圆角不变 */
-}
-
-
-/* 计时器内部内容 */
-.tracker-content {
-    transition: opacity 0.4s;
-}
-
-.anniversary-tracker.collapsed .tracker-content {
-    opacity: 0; /* 折叠时隐藏内容 */
-    pointer-events: none;
-}
-
-/* 标题和起始日期 (缩小字体) */
-.anniversary-tracker h1 {
-    font-size: 0.85em; 
-    margin: 0 0 8px 0;
-    font-weight: 500;
-}
-
-/* 主天数显示 (缩小字体) */
-.day-count {
-    font-size: 2.2em; 
-    font-weight: bold;
-    color: #d81b60; 
-    line-height: 1.1;
-}
-
-.day-label {
-    font-size: 0.7em; 
-    font-weight: 500;
-    color: #6a6a6a;
-    margin-top: 3px;
-}
-
-
-/* ----------------------------------
-    折叠按钮样式 (宽度 25px)
-    ---------------------------------- */
-
-.collapse-button {
-    position: absolute;
-    top: -1px; /* 向上微调 1px 覆盖边框 */
-    right: -25px; /* 按钮宽度为 25px */
-    width: 25px; 
-    /* 确保按钮高度和父容器高度匹配，从 -1px 到 100%+1px */
-    height: calc(100% + 2px); 
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    
-    background-color: rgba(255, 192, 203, 0.9); 
-    
-    /* ***** 核心修改：保留按钮圆角 ***** */
-    border-radius: 0 10px 10px 0;
-    
-    cursor: pointer;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    
-    font-size: 1em; 
-    color: #4a4a4a;
-    transition: background-color 0.2s;
-}
-
-.collapse-button:hover {
-    background-color: rgba(255, 192, 203, 1);
-}
-
-/* 按钮内部的箭头图标 */
-.arrow {
-    transition: transform 0.4s;
-    font-weight: 800;
-}
-
-/* 折叠时，箭头图标旋转指向右侧 */
-.anniversary-tracker.collapsed .arrow {
-    transform: rotate(180deg);
-}
-    </style>
-</head>
-<body>
-
-<div id="anniversaryTracker" class="anniversary-tracker">
-    <div id="collapseButton" class="collapse-button">
-        <span class="arrow">❮</span>
-    </div>
-
-    <div class="tracker-content">
-        <h1>我们在一起</h1>
+<div id="modalBackdrop" class="modal-backdrop">
+    <div id="announcementModal" class="announcement-modal">
+        <div class="modal-title">陈❤钟</div>
         
-        <div class="day-count" id="daysCount">0</div>
-        <div class="day-label">天</div>
+        <div class="modal-content-text">
+            <div>欢迎回到我们的专属甜蜜主页！</div>
+            
+            <div class="days-counter-section">
+                我们已经在一起
+                <div class="day-count-modal" id="daysCount">0</div>
+                天了！
+            </div>
+            <div>这是我们共同度过的时光证明。</div>
+            <div></div>
+            </div>
+        
+        <button id="closeModal" class="close-button">我知道了</button>
     </div>
 </div>
 
 
 <script>
+/* ----------------------------------
+   JavaScript 交互逻辑 (毛玻璃弹窗与计时器)
+   ---------------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
     // 【！重要！】请在这里设置你们开始的日期和时间
-    // 假设今天是 2025 年 10 月 18 日。这里设置一个开始日期来计算天数。
     const START_DATE = new Date('2024-12-06T14:00:00'); 
-    
-    const trackerContainer = document.getElementById('anniversaryTracker');
-    const daysCountSpan = document.getElementById('daysCount');
-    const collapseButton = document.getElementById('collapseButton');
-    
-    let isCollapsed = false;
 
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    const closeModalButton = document.getElementById('closeModal');
+    const daysCountSpan = document.getElementById('daysCount');
+    const body = document.body; // 获取 body 元素
+    
     // --- 1. 计时逻辑 ---
     function updateTime() {
         const now = new Date();
@@ -1034,37 +1108,38 @@ document.addEventListener('DOMContentLoaded', () => {
         // 计算精确的总天数（向下取整）
         const totalDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
         
-        // 使用当前语言环境格式化数字，例如在中文环境中可能是 '1,234'
-        daysCountSpan.textContent = totalDays.toLocaleString();
+        // 使用 toLocaleString('en-US') 保证数字有逗号分隔（如 1,234）
+        daysCountSpan.textContent = totalDays.toLocaleString('en-US');
 
-        // 设置一个延迟更新，例如每 1 小时更新一次，以保证零点切换的准确性
+        // 每小时更新一次，以保证零点切换的准确性
         setTimeout(updateTime, 3600000); 
     }
 
-    // --- 2. 折叠逻辑 ---
-    function toggleCollapse() {
-        if (isCollapsed) {
-            // 展开
-            trackerContainer.classList.remove('collapsed');
-            isCollapsed = false;
-        } else {
-            // 折叠
-            trackerContainer.classList.add('collapsed');
-            isCollapsed = true;
-        }
+    // --- 2. 弹窗逻辑 ---
+    
+    // 显示弹窗的函数：阻止滚动和交互
+    function showModal() {
+        modalBackdrop.classList.remove('hidden');
+        // 核心阻止交互：禁止 body 滚动
+        body.style.overflow = 'hidden'; 
     }
 
-    // 绑定折叠按钮事件
-    collapseButton.addEventListener('click', toggleCollapse);
+    // 隐藏弹窗的函数：恢复滚动和交互
+    function hideModal() {
+        modalBackdrop.classList.add('hidden');
+        // 核心允许交互：恢复 body 滚动
+        body.style.overflow = ''; 
+    }
+
+    // 绑定关闭按钮事件：仅允许按钮关闭
+    closeModalButton.addEventListener('click', hideModal);
     
     // 默认执行一次计时
     updateTime(); 
     
-    // 默认执行一次折叠，让它一开始就处于隐藏状态，避免影响内容浏览
-    // 如果不需要一开始就折叠，请删除下面这行
-    // toggleCollapse(); 
+    // **页面加载完成时显示弹窗并阻止交互**
+    showModal();
 });
 </script>
- 
 </body>
 </html>
