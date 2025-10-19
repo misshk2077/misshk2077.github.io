@@ -509,11 +509,12 @@
             <p><a href="#">回到顶部 ↑</a></p>
         </div>
     </footer>
-   <script>
+
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             gsap.registerPlugin(ScrollTrigger);
 
-            // Navbar animations (simple fade in)
+            // Navbar animations (simple fade in for this page)
             gsap.fromTo('.logo', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.2 });
             gsap.fromTo('.nav-links li', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.15, delay: 0.4 });
             
@@ -521,63 +522,45 @@
             gsap.from('.page-header h1', { opacity:0, y:-30, duration: 0.8, delay: 0.5, ease:'power3.out' });
             gsap.from('.page-header .subtitle', { opacity:0, y:-20, duration: 0.8, delay: 0.7, ease:'power3.out' });
 
-            // Album items animation
-            gsap.utils.toArray('.photo-grid').forEach(grid => {
-                const items = grid.querySelectorAll('.photo-item');
-                gsap.fromTo(items, 
-                    { opacity: 0, y: 50, scale: 0.9 },
+            // Timeline items animation
+            const timelineItems = gsap.utils.toArray('.timeline-item');
+            timelineItems.forEach((item, index) => {
+                let direction = 1; // Default slide from right for 'right' items
+                if (item.classList.contains('left')) {
+                    direction = -1; // Slide from left for 'left' items
+                }
+
+                gsap.fromTo(item, 
+                    { opacity: 0, x: direction * 100, y:50 }, // Start from side and slightly down
                     {
                         opacity: 1,
+                        x: 0,
                         y: 0,
-                        scale: 1,
-                        duration: 0.6,
-                        stagger: 0.15,
-                        ease: 'power2.out',
+                        duration: 0.8,
+                        ease: 'power3.out',
                         scrollTrigger: {
-                            trigger: grid,
-                            start: 'top 80%',
-                            toggleActions: 'play none none none',
-                            // markers: true, 
+                            trigger: item,
+                            start: 'top 85%', // When 85% of the item is visible
+                            toggleActions: 'play none none none', // Play once
+                            // markers: true, // Uncomment for debugging ScrollTrigger
                         }
                     }
                 );
             });
-
-            // Modal functionality
-            const modal = document.getElementById('imageModal');
-            const modalImg = document.getElementById('modalImage');
-            const captionText = document.getElementById('modalCaption');
-            const closeModalBtn = document.getElementById('closeModalBtn');
-
-            document.querySelectorAll('.photo-item img').forEach(img => {
-                img.addEventListener('click', function() {
-                    const photoItem = this.closest('.photo-item');
-                    const captionDiv = photoItem.querySelector('.photo-caption');
-                    
-                    modal.style.display = "block";
-                    gsap.to(modal, {opacity: 1, scale: 1, duration: 0.3, ease: 'power2.out'});
-                    modalImg.src = this.src;
-                    modalImg.alt = this.alt;
-                    captionText.innerHTML = captionDiv ? captionDiv.innerHTML : this.alt; // Use caption if available
-                });
+            
+            // CTA section animation
+            gsap.from('.add-memory-cta', {
+                opacity: 0,
+                y: 50,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: '.add-memory-cta',
+                    start: 'top 90%',
+                    toggleActions: 'play none none none'
+                }
             });
 
-            closeModalBtn.onclick = function() {
-                gsap.to(modal, {opacity: 0, scale: 0.9, duration: 0.3, ease: 'power2.in', onComplete: () => {
-                    modal.style.display = "none";
-                }});
-            }
-
-            // Close modal when clicking outside the image
-            window.onclick = function(event) {
-                if (event.target == modal) {
-                    gsap.to(modal, {opacity: 0, scale: 0.9, duration: 0.3, ease: 'power2.in', onComplete: () => {
-                        modal.style.display = "none";
-                    }});
-                }
-            }
-
-            // Responsive Navbar Toggle & Scroll Logic (与 index.html 相同)
+         // Responsive Navbar Toggle & Scroll Logic (与 index.html 相同)
             const menuToggle = document.getElementById('menuToggle');
             const navLinks = document.getElementById('navLinks');
             const navbar = document.querySelector('.navbar'); // **获取导航栏元素**
@@ -628,5 +611,6 @@
             }
         });
     </script>
+
 </body>
 </html>
