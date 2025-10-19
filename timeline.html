@@ -90,6 +90,13 @@
             text-decoration: none;
         }
 
+        /* ****** 新增：右侧导航元素分组 ****** */
+        .nav-right-group {
+            display: flex;
+            align-items: center;
+        }
+        /* ********************************* */
+
         .nav-links {
             list-style: none;
             display: flex;
@@ -120,6 +127,7 @@
             background: none;
             border: none;
             cursor: pointer;
+            margin-left: 15px; /* 与导航链接保持间距 */
         }
 
         /* 3. 页面主标题区域 */
@@ -367,8 +375,15 @@
                 margin: 10px 0;
                 text-align: center;
             }
+
+            /* 移动端显示汉堡菜单时，需要重置右侧分组的 flex 行为 */
+            .nav-right-group {
+                display: flex;
+                align-items: center;
+            }
             .menu-toggle {
                 display: block;
+                margin-left: 15px;
             }
 
             .page-header h1 {
@@ -422,13 +437,16 @@
     <header class="navbar">
         <div class="container">
             <a href="index.html" class="logo">爱の印记 💖</a>
-            <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="index.html">甜蜜主页 🏠</a></li>
-                <li><a href="timeline.html" class="active">时光轴 ⏳</a></li>
-                <li><a href="album.html">甜蜜相册 📸</a></li>
-                <li><a href="fxq1/index.html">飞行棋 ✈️</a></li> 
-                <li><a href="sr/index.html">生日纪念 🎂</a></li> </ul>
+            <div class="nav-right-group">
+                <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">☰</button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="index.html">甜蜜主页 🏠</a></li>
+                    <li><a href="timeline.html" class="active">时光轴 ⏳</a></li>
+                    <li><a href="album.html">甜蜜相册 📸</a></li>
+                    <li><a href="fxq1/index.html">飞行棋 ✈️</a></li> 
+                    <li><a href="sr/index.html">生日纪念 🎂</a></li> 
+                </ul>
+            </div>
         </div>
     </header>
 
@@ -560,7 +578,8 @@
                 }
             });
 
-         // Responsive Navbar Toggle & Scroll Logic (与 index.html 相同)
+
+            // Responsive Navbar Toggle & Scroll Logic (与 index.html 相同)
             const menuToggle = document.getElementById('menuToggle');
             const navLinks = document.getElementById('navLinks');
             const navbar = document.querySelector('.navbar'); // **获取导航栏元素**
