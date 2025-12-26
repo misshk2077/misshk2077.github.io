@@ -7,186 +7,238 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>最爱宝宝 - 生日快乐</title>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. 滚动平滑度与性能优化 --- */
+        html { scroll-behavior: smooth; }
+        body { -webkit-overflow-scrolling: touch; margin: 0; padding: 0; }
+        .content-container { height: 100vh; overflow-y: auto; scroll-snap-type: y mandatory; }
+        .fullscreen-section { scroll-snap-align: start; scroll-snap-stop: always; will-change: transform; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+
+        /* --- 2. 生日祝福卡片 --- */
+        .wish-card { perspective: 1000px; }
+        .wish-card-front { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important; color: white !important; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4); }
+        .wish-card-back { background: #fff5f6 !important; color: #d63384 !important; border: 1px solid #ffcad4; }
+
+        /* --- 3. 在一起计时器样式 --- */
+        .love-timer-wrapper {
+            background: rgba(255, 182, 193, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+            border: 1px dashed #ffb6c1;
+            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.1);
+        }
+        .timer-title { font-size: 0.95rem; color: #ff6b81; margin-bottom: 10px; display: block; letter-spacing: 1px; }
+        .timer-display { font-family: 'Montserrat', sans-serif; font-weight: 700; color: #d63384; }
+        .timer-unit-box { display: inline-block; margin: 0 3px; }
+        .t-num { font-size: 1.4rem; }
+        .t-label { font-size: 0.8rem; margin-left: 2px; color: #888; }
+
+        /* --- 4. 数学挑战与弹窗样式 --- */
+        .challenge-container { text-align: center; padding: 20px; z-index: 10; }
+        .math-card { background: rgba(255, 255, 255, 0.9); padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(255, 182, 193, 0.3); display: inline-block; border: 2px solid #ffcad4; }
+        .question { font-size: 1.2rem; color: #d63384; margin-bottom: 25px; font-weight: bold; font-family: 'Montserrat', sans-serif; line-height: 2; }
+        .answer-input { padding: 12px; border: 2px solid #ffcad4; border-radius: 10px; outline: none; width: 180px; text-align: center; font-size: 1.2rem; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto; }
+        
+        /* 弹窗样式 */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.75); display: flex; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(5px); }
+        .modal-content { background: white; padding: 40px; border-radius: 25px; text-align: center; box-shadow: 0 0 30px rgba(255, 107, 129, 0.5); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-width: 80%; }
+        .modal-text-line { font-size: 1.3rem; margin: 15px 0; color: #d63384; font-weight: bold; line-height: 1.6; }
+        .close-modal-btn { margin-top: 25px; padding: 12px 35px; background: linear-gradient(to right, #ff9a9e, #ff6b81); color: white; border: none; border-radius: 25px; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(255, 107, 129, 0.3); }
+        .hidden { display: none !important; }
+
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
 </head>
 <body>
-    <div class="starry-sky-container">
-        <canvas id="starry-sky"></canvas>
-    </div>
+    <div class="starry-sky-container"><canvas id="starry-sky"></canvas></div>
 
     <div class="content-container">
-        <!-- 倒计时区域 -->
         <div id="countdown-container" class="main-content">
             <h1 class="title">距离我最爱的人生日还有</h1>
             <div class="countdown-timer">
-                <div class="time-unit">
-                    <span id="days" class="time-value">00</span>
-                    <span class="time-label">天</span>
-                </div>
-                <div class="time-unit">
-                    <span id="hours" class="time-value">00</span>
-                    <span class="time-label">时</span>
-                </div>
-                <div class="time-unit">
-                    <span id="minutes" class="time-value">00</span>
-                    <span class="time-label">分</span>
-                </div>
-                <div class="time-unit">
-                    <span id="seconds" class="time-value">00</span>
-                    <span class="time-label">秒</span>
-                </div>
+                <div class="time-unit"><span id="days" class="time-value">00</span><span class="time-label">天</span></div>
+                <div class="time-unit"><span id="hours" class="time-value">00</span><span class="time-label">时</span></div>
+                <div class="time-unit"><span id="minutes" class="time-value">00</span><span class="time-label">分</span></div>
+                <div class="time-unit"><span id="seconds" class="time-value">00</span><span class="time-label">秒</span></div>
             </div>
             <p class="love-message">在这段等待的时光里，我的爱只增不减 ❤️</p>
-            
-            <!-- 生日提示 -->
             <div class="birthday-reminder">
                 <span class="reminder-icon">🎁</span>
                 <p class="reminder-text">请记得在生日当天打开，这里有一份特别的惊喜在等你！</p>
             </div>
         </div>
 
-        <!-- 生日祝福区域 -->
         <div id="birthday-container" class="main-content hidden">
-            <div class="fireworks-container">
-                <canvas id="fireworks-canvas"></canvas>
-            </div>
+            <div class="fireworks-container"><canvas id="fireworks-canvas"></canvas></div>
             
-            <!-- 第一部分：头部祝福语 -->
-            <section class="fullscreen-section hidden" id="greeting-section">
+            <section class="fullscreen-section" id="greeting-section">
                 <h1 class="title birthday-title">生日快乐，我最爱的宝宝！</h1>
-                
-                <!-- 礼物盒环节 -->
                 <div id="gift-section" class="gift-section">
                     <div class="gift-box">
-                        <div class="gift-lid"></div>
-                        <div class="gift-box-body"></div>
-                        <div class="gift-ribbon"></div>
+                        <div class="gift-lid"></div><div class="gift-box-body"></div><div class="gift-ribbon"></div>
                         <div class="gift-tag">点击打开你的礼物</div>
                     </div>
                 </div>
-                
-                <!-- 主要祝福信息 - 添加hidden类 -->
                 <div class="birthday-message hidden">
                     <p class="large-text">亲爱的宝宝，祝你生日快乐！</p>
-                    <p class="message-content">
-                        在这特别的日子里，小宝宝祝愿宝宝能不断成长进步，要保持乐观！
-                        从相识到相知，这是我为你过的第2个生日。
-                        希望在未来的日子里，我能继续陪伴在你身边，见证你的每一刻。
-                    </p>
+                    <p class="message-content">在这特别的日子里，小宝宝祝愿宝宝能不断成长进步，要保持乐观！从相识到相知，这是我为你过的第2个生日。希望在未来的日子里，我能继续陪伴在你身边。</p>
                     <p class="message-signature">永远爱你的陈小宝❤️</p>
                 </div>
-                
-                <!-- 滚动指示器 - 默认CSS已隐藏，不需要hidden类 -->
                 <div class="scroll-indicator"></div>
             </section>
 
-            <!-- 第二部分：爱心树 -->
-            <section class="fullscreen-section hidden" id="love-tree-section">
-                <!-- 互动爱心树 -->
+            <section class="fullscreen-section" id="love-tree-section">
                 <div class="love-tree-container">
                     <h2 class="section-title">我们的爱心树</h2>
                     <p class="tree-instruction">点击屏幕添加一颗爱心</p>
                     <canvas id="love-tree" width="300" height="400"></canvas>
                 </div>
-                
-                <!-- 滚动指示器 - 默认CSS已隐藏，不需要hidden类 -->
                 <div class="scroll-indicator"></div>
             </section>
 
-            <!-- 第三部分：生日祝福和许愿 -->
-            <section class="fullscreen-section hidden" id="wishes-section">
-                <!-- 互动祝福卡片区 -->
+            <section class="fullscreen-section" id="wishes-section">
                 <div class="wishes-container">
                     <h2 class="section-title">生日祝福</h2>
                     <div class="wishes-cards">
                         <div class="wish-card" onclick="this.classList.toggle('flipped')">
-                            <div class="wish-card-front">
-                                <span>点我❤</span>
-                            </div>
-                            <div class="wish-card-back">
-                                <p>祝愿宝宝身体健康，快乐成长！</p>
-                            </div>
+                            <div class="wish-card-front"><span>点我❤</span></div>
+                            <div class="wish-card-back"><p>祝愿宝宝身体健康，快乐成长！</p></div>
                         </div>
                         <div class="wish-card" onclick="this.classList.toggle('flipped')">
-                            <div class="wish-card-front">
-                                <span>点我❤</span>
-                            </div>
-                            <div class="wish-card-back">
-                                <p>希望宝宝能够赚更多钱钱给小宝宝花~嘿嘿！</p>
-                            </div>
+                            <div class="wish-card-front"><span>点我❤</span></div>
+                            <div class="wish-card-back"><p>希望宝宝能够赚更多钱钱给小宝宝花~嘿嘿！</p></div>
                         </div>
                         <div class="wish-card" onclick="this.classList.toggle('flipped')">
-                            <div class="wish-card-front">
-                                <span>点我❤</span>
-                            </div>
-                            <div class="wish-card-back">
-                                <p>祝愿宝宝能够学业有成！</p>
-                            </div>
+                            <div class="wish-card-front"><span>点我❤</span></div>
+                            <div class="wish-card-back"><p>祝愿宝宝能够学业有成！</p></div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- 心愿许愿区 -->
                 <div class="wish-maker">
-                    <h2 class="section-title">许下生日愿望</h2>
                     <div class="cake-container">
-                        <div class="cake">
-                            <div class="candle">
-                                <div class="flame"></div>
-                            </div>
-                        </div>
-                        <div class="wish-result" id="wish-result">
-                            <!-- 许愿后的提示信息将在这里显示 -->
-                        </div>
+                        <div class="cake"><div class="candle"><div class="flame"></div></div></div>
+                        <div id="wish-result" class="wish-result"></div>
                     </div>
                     <button id="make-wish-btn" class="wish-button">吹蜡烛许愿</button>
                 </div>
-                
-                <!-- 滚动指示器 - 默认CSS已隐藏，不需要hidden类 -->
                 <div class="scroll-indicator"></div>
             </section>
 
-            <!-- 第四部分：爱的告白 -->
-            <section class="fullscreen-section hidden" id="love-letter-section">
-                <!-- 爱的告白 -->
+            <section class="fullscreen-section" id="math-challenge-section">
+                <div class="challenge-container">
+                    <h2 class="section-title">智力挑战</h2>
+                    <p class="love-message" style="margin-bottom: 20px;">宝宝，解开这道关于“永恒”的函数题，就能领取礼物：</p>
+                    <div class="math-card">
+                        <div class="question">
+                            已知函数 \( f(x) = \log_{2}(x - 8) + 1314 \)<br>
+                            若满足 \( f(x) = 1323 \)<br>
+                            求 \( x \) 的值？
+                        </div>
+                        <input type="number" id="math-answer" placeholder="输入答案..." class="answer-input">
+                        <button onclick="checkMathAnswer()" class="wish-button">提交答案</button>
+                    </div>
+                </div>
+                <div class="scroll-indicator"></div>
+            </section>
+
+            <section class="fullscreen-section" id="love-letter-section">
                 <div class="love-letter">
                     <h2 class="section-title">给宝宝的一封信</h2>
                     <div class="letter-content">
                         <p>亲爱的宝宝，</p>
+                        
+                        <div class="love-timer-wrapper">
+                            <span class="timer-title">💕 我们已经相爱了 💕</span>
+                            <div class="timer-display">
+                                <div class="timer-unit-box"><span id="t-days" class="t-num">0</span><span class="t-label">天</span></div>
+                                <div class="timer-unit-box"><span id="t-hours" class="t-num">00</span><span class="t-label">时</span></div>
+                                <div class="timer-unit-box"><span id="t-minutes" class="t-num">00</span><span class="t-label">分</span></div>
+                                <div class="timer-unit-box"><span id="t-seconds" class="t-num">00</span><span class="t-label">秒</span></div>
+                            </div>
+                        </div>
+
                         <p>时光如梭，转眼间我们已相伴走过了许多日子。在你的生日这天，想告诉你，你是我生命中最美好的礼物。</p>
-                        <p>在我们认识的时间里，我见证了你从刚开始的羞涩到不正经，嘿嘿嘿。</p>
-                        <p>但感谢你出现在我的生命中，感谢你让我有机会爱你、陪伴你、与你一同成长。</p>
-                        <p>今后的路还很长，祝愿我们幸福美满。</p>
+                        <p>但在我们认识的时间里，我见证了你从刚开始的羞涩到不正经，嘿嘿嘿。今后的路还很长，祝愿我们幸福美满。</p>
                         <p>生日快乐，我最爱的宝宝！</p>
                         <p class="signature">爱你的小宝宝</p>
                     </div>
                 </div>
-                
-                <!-- 滚动指示器 - 默认CSS已隐藏，不需要hidden类 -->
-                <div class="scroll-indicator"></div>
             </section>
             
             <div class="floating-hearts"></div>
         </div>
     </div>
 
-    <!-- 音乐播放器 -->
+    <div id="gift-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-text-line">🎁 恭喜宝宝解开爱的方程式！</div>
+            <div class="modal-text-line">正确答案正是 520</div>
+            <div class="modal-text-line">这是属于你的专属礼物(快递码)：</div>
+            <div class="modal-text-line">一生一世的陪伴与爱 ❤️</div>
+            <button onclick="closeModal()" class="close-modal-btn">收下礼物</button>
+        </div>
+    </div>
+
     <div class="music-player">
-        <button id="music-toggle" class="music-btn">
-            <span class="music-icon">♪</span>
-        </button>
-        <audio id="bgm" loop>
-            <!-- 
-            请将你喜欢的音乐文件放在 assets/audio/ 目录下，并命名为 birthday-music.mp3
-            如果有多种格式，可以添加多个source标签以提高兼容性
-            -->
-            <source src="assets/audio/birthday-music.mp3" type="audio/mpeg">
-            <source src="assets/audio/birthday-music.ogg" type="audio/ogg">
-            <p>您的浏览器不支持HTML5音频</p>
-        </audio>
+        <button id="music-toggle" class="music-btn"><span class="music-icon">♪</span></button>
+        <audio id="bgm" loop><source src="assets/audio/birthday-music.mp3" type="audio/mpeg"></audio>
     </div>
 
     <script src="js/script.js"></script>
+    <script>
+        // 数学校验逻辑
+        function checkMathAnswer() {
+            const answer = document.getElementById('math-answer').value;
+            if (answer == "520") { 
+                document.getElementById('gift-modal').classList.remove('hidden');
+            } else {
+                alert("哎呀，算错啦！提示：2 的 9 次方是多少？再算算看宝宝~ 😘");
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('gift-modal').classList.add('hidden');
+            document.getElementById('love-letter-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 在一起计时器逻辑
+        (function() {
+            const startDate = new Date(2024, 11, 6, 0, 0, 0); 
+            function updateTogetherTime() {
+                const now = new Date();
+                const diff = now - startDate;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+                const dElem = document.getElementById('t-days');
+                const hElem = document.getElementById('t-hours');
+                const mElem = document.getElementById('t-minutes');
+                const sElem = document.getElementById('t-seconds');
+                if (dElem) {
+                    dElem.innerText = days;
+                    hElem.innerText = hours.toString().padStart(2, '0');
+                    mElem.innerText = minutes.toString().padStart(2, '0');
+                    sElem.innerText = seconds.toString().padStart(2, '0');
+                }
+            }
+            setInterval(updateTogetherTime, 1000);
+            updateTogetherTime();
+        })();
+    </script>
 </body>
-</html> 
+</html>
