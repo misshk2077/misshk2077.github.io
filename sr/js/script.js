@@ -1,5 +1,5 @@
 // 全局变量
-const BIRTHDAY_MONTH = 12; // JavaScript中月份从0开始，所以5月是4
+const BIRTHDAY_MONTH = 1; // JavaScript中月份从0开始，所以5月是4
 const BIRTHDAY_DAY = 3;
 const CELEBRATION_DAYS = 3; // 生日庆祝持续30天
 
